@@ -290,9 +290,20 @@ didCompleteWithError:(NSError *)error {
     if (response != nil)
     {
         [data setObject:[NSNumber numberWithInteger:response.statusCode] forKey:@"responseCode"];
+        
+        // turn response into a dictionary so doesnt puke javascript down the line
+        NSDictionary * d = @{
+            @"URL" : response.URL.absoluteString,
+            @"statusCode" : [NSNumber numberWithInteger:response.statusCode],
+            @"allHeaderFields" : response.allHeaderFields // this is an NSDictionary
+        };
+        
+        [data setObject:d forKey:@"NSHTTPURLResponse"];
+        
     }
+    
     //Add data that was collected earlier by the didReceiveData method
-    NSMutableData *responseData = _responsesData[@(task.taskIdentifier)];
+    NSMutableData *responseData = _responsesData[@(task.taskIdentifier)]; // _responsesData can be empty
     if (responseData) {
         [_responsesData removeObjectForKey:@(task.taskIdentifier)];
         NSString *response = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
